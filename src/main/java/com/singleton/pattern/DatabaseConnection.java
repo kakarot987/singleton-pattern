@@ -1,22 +1,24 @@
 package com.singleton.pattern;
 
 /**
- * Database Connection Singleton
- * Demonstrates a practical use case of the Singleton pattern.
- * Ensures only one database connection is used throughout the application.
+ * Educational singleton holding *simulated* database-connection metadata.
+ *
+ * No JDBC connection is created, opened, or closed here. Production Spring
+ * applications should normally obtain connections from a managed DataSource
+ * pool rather than sharing a single JDBC Connection across threads.
  */
-public class DatabaseConnection {
+public final class DatabaseConnection {
 
-    private static DatabaseConnection instance;
+    // Double-checked locking requires volatile for safe publication.
+    private static volatile DatabaseConnection instance;
     private String connectionString;
-    private boolean isConnected = false;
+    private boolean connected;
 
-    // Private constructor
     private DatabaseConnection() {
-        System.out.println("DatabaseConnection instance created");
+        System.out.println("Simulated DatabaseConnection singleton created");
     }
 
-    // Bill Pugh pattern for thread-safe lazy loading
+    // Double-checked locking (NOT the Bill Pugh holder pattern).
     public static DatabaseConnection getInstance() {
         if (instance == null) {
             synchronized (DatabaseConnection.class) {
@@ -28,22 +30,24 @@ public class DatabaseConnection {
         return instance;
     }
 
-    public void connect(String connectionString) {
+    /** Only updates demo state; does not establish a network/database connection. */
+    public synchronized void connect(String connectionString) {
+        if (connectionString == null || connectionString.isBlank()) {
+            throw new IllegalArgumentException("Connection string is required");
+        }
         this.connectionString = connectionString;
-        this.isConnected = true;
-        System.out.println("Connected to: " + connectionString);
+        this.connected = true;
     }
 
-    public void disconnect() {
-        this.isConnected = false;
-        System.out.println("Disconnected from database");
+    public synchronized void disconnect() {
+        this.connected = false;
     }
 
-    public boolean isConnected() {
-        return isConnected;
+    public synchronized boolean isConnected() {
+        return connected;
     }
 
-    public String getConnectionString() {
+    public synchronized String getConnectionString() {
         return connectionString;
     }
 }
