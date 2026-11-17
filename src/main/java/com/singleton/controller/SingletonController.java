@@ -136,7 +136,7 @@ public class SingletonController {
             response.put("isSameInstance", db1 == db2);
             response.put("isConnected", db1.isConnected());
             response.put("connectionString", db1.getConnectionString());
-            response.put("description", "Practical use case - ensures single database connection throughout application.");
+            response.put("description", "Simulation only: shares connection metadata; does NOT open a JDBC connection. Use a connection pool in real services.");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -181,9 +181,9 @@ public class SingletonController {
         }});
         
         patterns.put("database", new HashMap<String, String>() {{
-            put("description", "Real-world example of singleton usage");
-            put("advantage", "Prevents multiple database connections");
-            put("disadvantage", "Not suitable for multi-database scenarios");
+            put("description", "Simulated shared connection metadata (no JDBC)");
+            put("advantage", "Illustrates instance identity across callers");
+            put("disadvantage", "Not a production JDBC connection pool");
         }});
         
         Map<String, Object> response = new HashMap<>();
